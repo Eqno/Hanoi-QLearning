@@ -79,6 +79,41 @@ def testQ(Q, maxStep, origin, target):
             return []
         state = copy.deepcopy(newState)
 
+def getMinStep(repTime, step, minstep):
+    delstep = 0
+    step = list(step)
+    while delstep != repTime:
+        if numpy.mean(step) > 7:
+            step.pop(0)
+            delstep += 1
+        else:
+            if delstep < minstep:
+                return delstep, True
+            else:
+                return minstep, False
+    if delstep < minstep:
+        return delstep, True
+    else:
+        return minstep, False
+
+def findFactor(repTime, learnRate, decayFactor, origin, target):
+    bestRate = 0.5
+    bestFactor = 0.7
+    Q, step = trainQ(repTime, bestRate, bestFactor, origin, target)
+    minstep, _ = getMinStep(50, step, 0xffffff)
+    best = []
+    for k in range(10):
+        for i in learnRate:
+            for j in decayFactor:
+                Q, step = trainQ(repTime, i, j, origin, target)
+                newMinstep, B = getMinStep(repTime, step, minstep)
+                if B:
+                    bestRate = i
+                    bestFactor = j
+                    minstep = copy.deepcopy(newMinstep)
+        best.append([bestRate, bestFactor])
+    return best
+
 def printState(state, N, M):
     for i in range(N-1, -1, -1):
         for j in state:
@@ -105,11 +140,16 @@ def printPath(path):
         printState(s[0], N, M)
     print("\n已达到目标状态。")
 
-origin = [[1, 2, 3, 4, 5], [], [], [], []]
-target = [[], [], [], [], [1, 2, 3, 4, 5]]
+origin = [[1, 2, 3, 4], [], [], []]
+target = [[], [], [], [1, 2, 3, 4]]
 
-Q, stepNum = trainQ(2000, 0.5, 0.7, origin, target)
-path = testQ(Q, 100, origin, target)
+# Q, stepNum = trainQ(2000, 0.5, 0.7, origin, target)
+# path = testQ(Q, 100, origin, target)
+#
+# print("共需要%d步。" % len(path))
+# printPath(path)
 
-print("共需要%d步。" % len(path))
-printPath(path)
+learningRate = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9]
+epsilonDecayFactor = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9]
+LAndE = findFactor(100,learningRate,epsilonDecayFactor, origin, target)
+print(LAndE)
