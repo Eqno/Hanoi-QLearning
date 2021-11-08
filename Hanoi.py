@@ -143,13 +143,13 @@ def printPath(path):
 origin = [[1, 2, 3, 4], [], [], []]
 target = [[], [], [], [1, 2, 3, 4]]
 
-# Q, stepNum = trainQ(2000, 0.5, 0.7, origin, target)
-# path = testQ(Q, 100, origin, target)
-#
-# print("共需要%d步。" % len(path))
-# printPath(path)
+Q, stepNum = trainQ(2000, 0.5, 0.7, origin, target)
+path = testQ(Q, 100, origin, target)
 
-learningRate = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9]
-epsilonDecayFactor = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9]
-LAndE = findFactor(100,learningRate,epsilonDecayFactor, origin, target)
-print(LAndE)
+print("共需要%d步。" % len(path))
+printPath(path)
+
+# learnRate = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9]
+# decayFactor = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9]
+# best = findFactor(100, learnRate, decayFactor, origin, target)
+# print(best)
