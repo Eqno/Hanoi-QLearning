@@ -99,13 +99,13 @@ def getMinStep(repTime, step, minstep):
 def findFactor(repTime, learnRate, decayFactor, origin, target):
     bestRate = 0.5
     bestFactor = 0.7
-    Q, step = trainQ(repTime, bestRate, bestFactor, origin, target)
+    step = trainQ(repTime, bestRate, bestFactor, origin, target)
     minstep, _ = getMinStep(50, step, 0xffffff)
     best = []
-    for k in range(10):
+    for _ in range(10):
         for i in learnRate:
             for j in decayFactor:
-                Q, step = trainQ(repTime, i, j, origin, target)
+                step = trainQ(repTime, i, j, origin, target)
                 newMinstep, B = getMinStep(repTime, step, minstep)
                 if B:
                     bestRate = i
@@ -115,38 +115,43 @@ def findFactor(repTime, learnRate, decayFactor, origin, target):
     return best
 
 def printState(state, N, M):
+    for i in range(M):
+        print("---", end='')
+    print('-')
     for i in range(N-1, -1, -1):
         for j in state:
             index = len(j) - i - 1
-            print("|%2d "%j[index] if index>=0 else "|   ", end='')
-        print("|")
-    for _ in range(M):
-        print("|---", end='')
+            print("|%2d"%j[index] if index>=0 else "|  ", end='')
+        print('|')
+    for i in range(M):
+        print("---", end='')
+    print('-')
+    for i in range(M):
+        print("|%2d" % (i+1), end='')
     print("|")
     for i in range(M):
-        print("| %c " % chr(ord('A')+i), end='')
-    print("|")
+        print("---", end='')
+    print('-')
 
 def printPath(path):
     if not len(path):
         return
     N = max(len(i) for i in path[0][0])
     M = len(path[0][0])
-    map = {i : chr(ord('A')+i) for i in range(M)}
-    print("\n初始状态：\n")
+    print("初始状态：")
     for i, s in enumerate(path):
         if len(s[1]):
-            print("\n第%d步操作：%c --> %c\n" % (i, map[s[1][0]], map[s[1][1]]))
+            print("第%d步操作：%d柱移到%d柱上。" % (i, s[1][0]+1, s[1][1]+1))
         printState(s[0], N, M)
-    print("\n已达到目标状态。")
+    print("已达到目标状态。")
 
-origin = [[1, 2, 3, 4], [], [], []]
-target = [[], [], [], [1, 2, 3, 4]]
+origin = [[1, 2, 3, 4], [], [], [], []]
+target = [[], [], [], [], [1, 2, 3, 4]]
 
 Q, stepNum = trainQ(2000, 0.5, 0.7, origin, target)
 path = testQ(Q, 100, origin, target)
 
-print("共需要%d步。" % len(path))
+print("达成目标状态最少需要%d步。" % (len(path)-1))
 printPath(path)
 
 # learnRate = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9]
